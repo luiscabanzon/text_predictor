@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+
+    <title>Text Predictor</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <style>
+    
+        
+        body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #eee;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+}
+.form-signin .checkbox {
+  font-weight: 400;
+}
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 60px; /* Margin bottom by footer height */
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px; /* Set the fixed height of the footer here */
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
+        
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="signin.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <form class="form-signin">
+        <h2 class="form-signin-heading">Text Predictor</h2>
+        <p>Created by <a href="http://www.twitter.com/luiscabanzon">@luiscabanzon<a/></p>
+        <div class="alert alert-danger" role="alert" id="wait_model_1">
+         Wait for model_1 to load!
+        </div>
+        <div class="alert alert-danger" role="alert" id="wait_model_2">
+         Wait for model_2 to load!
+        </div>
+        <!--<label for="inputEmail" class="sr-only">Start typing!</label>
+        <input type="text" id="inputEmail" class="form-control" placeholder="Start typing!" required autofocus>-->
+        
+        <textarea class="form-control" id="input_box" rows="3"></textarea>
+        
+        <!--<label for="inputPassword" class="sr-only">Password</label>
+        <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>-->
+        <!--<button class="btn btn-lg btn-primary btn-block" type="Predict" onclick="predict()">Predict</button>-->
+        <button type="button" class="btn btn-primary" onclick="predict()">Predict</button>
+      </form>
+      <br><br>
+      <p>Input Text:</p>
+      <p id="input_text"></p>
+      <b></b>
+      <p>Next word:</p>
+      <p id="prediction_1"></p>
+      <p>Next 2 words:</p>
+      <p id="prediction_2"></p>
+
+    </div> <!-- /container -->
+  </body>
+  <footer class="footer">
+      <div class="container">
+        <span class="text-muted">Created by <a href="http://www.twitter.com/luiscabanzon">@luiscabanzon<a/></span>
+      </div>
+    </footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $.getJSON('./src/1_1_predictor.json', function(data) {
+        bigram = data; //data is the JSON string
+        $('#wait_model_1').hide();
+        });
+        
+        $.getJSON('./src/1_2_predictor.json', function(data) {
+        trigram = data; //data is the JSON string
+        $('#wait_model_2').hide();
+        });
+    
+    
+    
+        function predict(){
+            var text = $("#input_box").val();
+            $("#input_text").text(text);
+            var input_text = text.replace(/\b[0-9]+\b/, "123").replace(/[^\w\s'`´]/, '').toLowerCase().trim();
+            var search_key = input_text.split(" ").pop();
+            var array = bigram[search_key];
+            output_1 = [];
+            for (var i in array) {
+            output_1.push("[" + array[i][0] + "]");
+            }
+            $("#prediction_1").text(output_1.join(' '));
+            
+            var array = trigram[search_key];
+            output_2 = [];
+            for (var i in array) {
+            output_2.push("[" + array[i][0].join(" ") + "]");
+            }
+            $("#prediction_2").text(output_2.join(' '));
+            
+            
+        }
+        
+    </script>
+</html>
